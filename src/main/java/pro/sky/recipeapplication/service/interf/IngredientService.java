@@ -18,5 +18,7 @@ public interface IngredientService {
 
     void deleteAllIngredients();
 
+    String getDataFileName();
+
     void addIngredientFromRecipe(List<Ingredient> ingredients);
 }

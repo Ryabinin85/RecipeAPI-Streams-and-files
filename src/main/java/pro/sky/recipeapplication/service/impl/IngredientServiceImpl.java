@@ -40,6 +40,11 @@ public class IngredientServiceImpl implements IngredientService {
         readFromFile();
     }
 
+    @Override
+    public String getDataFileName() {
+        return dataFileName;
+    }
+
     public void addIngredientFromRecipe(List<Ingredient> ingredients) {
         for (Ingredient ingredient : ingredients) {
             if (!ingredientList.containsValue(ingredient)) {

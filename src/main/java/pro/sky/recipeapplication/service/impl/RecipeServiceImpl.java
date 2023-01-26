@@ -13,10 +13,12 @@ import pro.sky.recipeapplication.service.interf.IngredientService;
 import pro.sky.recipeapplication.service.interf.RecipeService;
 
 import javax.annotation.PostConstruct;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 
 import static pro.sky.recipeapplication.service.impl.IngredientServiceImpl.getIngredientList;
 
@@ -41,6 +43,11 @@ public class RecipeServiceImpl implements RecipeService {
     @PostConstruct
     private void init() {
         readFromFile();
+    }
+
+    @Override
+    public String getDataFileName() {
+        return dataFileName;
     }
 
     @Override
@@ -111,6 +118,22 @@ public class RecipeServiceImpl implements RecipeService {
                     .filter(x -> x.getIngredients().contains(ingredient))
                     .toList();
         } else return null;
+    }
+
+
+    @Override
+    public Path createReport(String recipeName) throws IOException, NoSuchElementException {
+        Path report = filesService.createTempFile("report");
+        Recipe recipe = recipeList.values()
+                .stream()
+                .filter(o -> o.getRecipeName().equals(recipeName))
+                .findAny()
+                .orElseThrow(); //todo append NoSuchElementException
+        try (Writer writer = Files.newBufferedWriter(report, StandardOpenOption.APPEND)) {
+            writer.append(recipe.getRecipeName()).append(String.valueOf(recipe.getIngredients()));
+            writer.append("\n");
+        }
+        return report;
     }
 
     private void saveToFile() {
