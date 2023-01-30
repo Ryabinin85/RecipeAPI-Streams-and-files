@@ -22,4 +22,9 @@ public class Ingredient {
 
     @NotBlank(message = "Units is mandatory")
     private String measureUnit;
+
+    @Override
+    public String toString() {
+        return name + " - " + quantity + " - " + measureUnit;
+    }
 }

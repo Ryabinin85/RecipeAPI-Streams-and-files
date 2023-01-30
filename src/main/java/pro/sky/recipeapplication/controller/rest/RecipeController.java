@@ -33,7 +33,7 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Поиск рецепта по его id")
     public ResponseEntity<Recipe> getRecipe(@RequestParam Long id) {
         Recipe recipe = recipeService.getRecipe(id);
@@ -43,7 +43,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipe);
     }
 
-    @GetMapping("/findrecipe")
+    @GetMapping(value = "/findrecipe", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Поиск рецептов по id ингредиента")
     public ResponseEntity<List<Recipe>> findRecipeByIngredient(@RequestParam Long id) {
         if (recipeService.findRecipeByIngredient(id) == null) {
@@ -52,7 +52,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.findRecipeByIngredient(id));
     }
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Получение всех рецептов")
     @ApiResponses(value = {
             @ApiResponse(
@@ -66,21 +66,22 @@ public class RecipeController {
                     }
             )
     })
-    public String getAllRecipes() {
-        return recipeService.getAllRecipes();
+    public ResponseEntity<String> getAllRecipes() {
+        return ResponseEntity.ok(recipeService.getAllRecipes());
     }
 
-    @PostMapping("/add")
+    @PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Добавление нового рецепта")
     public ResponseEntity<Recipe> addRecipe(@RequestBody Recipe recipe) {
-        recipeService.addRecipe(recipe);
-        return ResponseEntity.ok().build();
+        if (recipeService.addRecipe(recipe)) {
+            return ResponseEntity.ok().build();
+        } else return ResponseEntity.badRequest().build();
     }
 
-    @PostMapping("/addlist")
+    @PostMapping(value = "/addlist", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Добавление списка рецептов")
     public ResponseEntity<List<Recipe>> addRecipeList(@RequestBody List<Recipe> recipe) {
-        if (recipe.isEmpty()) {
+        if (recipe.isEmpty() || !recipeService.addRecipeList(recipe)) {
             return ResponseEntity.badRequest().build();
         } else {
             recipeService.addRecipeList(recipe);
@@ -88,7 +89,7 @@ public class RecipeController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Изменение рецепта",
             description = "Поиск рецепта по его id и изменение значений его полей")
     @Parameters(value = {
@@ -121,9 +122,15 @@ public class RecipeController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/report")
+    @GetMapping(value = "/report", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "Скачать рецепт")
+    @Parameter(name = "recipeName", description = "Ввести название рецепта")
     public ResponseEntity<Object> downloadReport(@RequestParam String recipeName) {
+
         try {
+            if (recipeService.createReport(recipeName) == null) {
+                return ResponseEntity.notFound().build();
+            }
             Path path = recipeService.createReport(recipeName);
             if (Files.size(path) == 0) {
                 return ResponseEntity.noContent().build();

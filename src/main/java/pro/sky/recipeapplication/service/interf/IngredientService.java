@@ -8,7 +8,7 @@ public interface IngredientService {
     Ingredient getIngredient(Long identifier);
 
 
-    void addNewIngredient(Ingredient ingredient);
+    boolean addNewIngredient(Ingredient ingredient);
 
     String getAllIngredients();
 

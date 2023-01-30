@@ -56,12 +56,13 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public void addNewIngredient(Ingredient ingredient) {
+    public boolean addNewIngredient(Ingredient ingredient) {
         if (!ingredientList.containsValue(ingredient)) {
             ingredientList.put(id++, ingredient);
-
-        }
-        saveToFile();
+            saveToFile();
+            return true;
+        } else
+            return false;
     }
 
     @Override
@@ -116,11 +117,9 @@ public class IngredientServiceImpl implements IngredientService {
         try {
             ingredientList = new ObjectMapper().readValue(json, new TypeReference<LinkedHashMap<Long, Ingredient>>() {
             });
-        }
-        catch (MismatchedInputException e) {
+        } catch (MismatchedInputException e) {
             e.getMessage();
-        }
-        catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }

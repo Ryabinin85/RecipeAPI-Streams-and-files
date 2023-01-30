@@ -51,23 +51,27 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public void addRecipe(Recipe recipe) {
+    public boolean addRecipe(Recipe recipe) {
         if (!recipeList.containsValue(recipe)) {
             recipeList.put(id++, recipe);
             ingredients.addIngredientFromRecipe(recipe.getIngredients());
-        }
-        saveToFile();
+            saveToFile();
+            return true;
+        } else return false;
     }
 
     @Override
-    public void addRecipeList(List<Recipe> recipe) {
+    public boolean addRecipeList(List<Recipe> recipe) {
+        boolean flag = false;
         for (Recipe newRecipe : recipe) {
             if (!recipeList.containsValue(newRecipe)) {
                 recipeList.put(id++, newRecipe);
                 ingredients.addIngredientFromRecipe(newRecipe.getIngredients());
+                flag = true;
             }
         }
         saveToFile();
+        return flag;
     }
 
     @Override
@@ -123,17 +127,48 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public Path createReport(String recipeName) throws IOException, NoSuchElementException {
+        int counter = 1;
+        if (!findRecipeByName(recipeName)) return null;
+
         Path report = filesService.createTempFile("report");
         Recipe recipe = recipeList.values()
                 .stream()
                 .filter(o -> o.getRecipeName().equals(recipeName))
                 .findAny()
-                .orElseThrow(); //todo append NoSuchElementException
+                .orElseThrow();
+
         try (Writer writer = Files.newBufferedWriter(report, StandardOpenOption.APPEND)) {
-            writer.append(recipe.getRecipeName()).append(String.valueOf(recipe.getIngredients()));
-            writer.append("\n");
+            writer.append(recipe.getRecipeName()).append("\n")
+                    .append("Время приготовления: ")
+                    .append(String.valueOf(recipe.getCookTime()))
+                    .append(" минут\n")
+                    .append("Ингредиенты: \n");
+
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                writer.append(ingredient.toString()).append("\n");
+            }
+
+            writer.append("Инструкция приготовления: \n");
+            for (String str : recipe.getCookingInstruction().values()) {
+                writer.append(String.valueOf(counter))
+                        .append(" ")
+                        .append(str).append("\n");
+                ++counter;
+            }
         }
         return report;
+    }
+
+    private boolean findRecipeByName(String name) {
+        boolean flag = false;
+
+        for (Recipe recipe : recipeList.values()) {
+            if (recipe.getRecipeName().equals(name)) {
+                flag = true;
+                break;
+            }
+        }
+        return flag;
     }
 
     private void saveToFile() {
@@ -156,6 +191,7 @@ public class RecipeServiceImpl implements RecipeService {
             throw new RuntimeException(e);
         }
     }
+
     private void cleanFile() {
         filesService.cleanDataFile(dataFileName);
     }

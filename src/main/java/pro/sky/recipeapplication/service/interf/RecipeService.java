@@ -10,9 +10,9 @@ import java.util.NoSuchElementException;
 public interface RecipeService {
     String getDataFileName();
 
-    void addRecipe(Recipe recipe);
+    boolean addRecipe(Recipe recipe);
 
-    void addRecipeList(List<Recipe> recipe);
+    boolean addRecipeList(List<Recipe> recipe);
 
     Recipe getRecipe(Long id);
 

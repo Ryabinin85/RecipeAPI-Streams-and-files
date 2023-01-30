@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.recipeapplication.model.Ingredient;
@@ -25,7 +26,7 @@ public class IngredientController {
         this.ingredientService = ingredientService;
     }
 
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Поиск ингредиента по его id")
     @Parameter(name = "id", description = "id ингредиента")
     public ResponseEntity<Ingredient> getIngredient(@RequestParam Long id) {
@@ -35,7 +36,7 @@ public class IngredientController {
             return ResponseEntity.ok(ingredientService.getIngredient(id));
     }
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Получение всех ингредиентов")
     @ApiResponses(value = {
             @ApiResponse(
@@ -49,18 +50,19 @@ public class IngredientController {
                     }
             )
     })
-    public String getAllIngredients() {
-        return ingredientService.getAllIngredients();
+    public ResponseEntity<String> getAllIngredients() {
+        return ResponseEntity.ok(ingredientService.getAllIngredients());
     }
 
-    @PostMapping("/add")
+    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Добавление нового ингредиента")
     public ResponseEntity<Ingredient> addIngredient(@RequestBody Ingredient ingredient) {
-        ingredientService.addNewIngredient(ingredient);
-        return ResponseEntity.ok().build();
+        if (ingredientService.addNewIngredient(ingredient)) {
+            return ResponseEntity.ok().build();
+        } else return ResponseEntity.badRequest().build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Изменение ингредиента",
             description = "Поиск ингредиента по его id и изменение значений его полей")
     @Parameters(value = {
@@ -80,10 +82,10 @@ public class IngredientController {
             description = "Удаление ингредиента по его id")
     @Parameter(name = "id", description = "id ингредиента")
     public ResponseEntity<Void> deleteIngredient(@PathVariable long id) {
-        if (ingredientService.deleteIngredient(id)) {
-            return ResponseEntity.ok().build();
+        if (!ingredientService.deleteIngredient(id)) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping

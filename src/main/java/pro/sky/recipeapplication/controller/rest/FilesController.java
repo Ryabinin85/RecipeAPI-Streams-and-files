@@ -2,7 +2,6 @@ package pro.sky.recipeapplication.controller.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -70,12 +69,17 @@ public class FilesController {
         filesService.cleanDataFile(dataFileName);
         File dataFile = filesService.getDataFile(dataFileName);
 
-        try (FileOutputStream fos = new FileOutputStream(dataFile)) {
-            IOUtils.copy(file.getInputStream(), fos);
+        try (BufferedInputStream bis = new BufferedInputStream(file.getInputStream());
+             FileOutputStream fos = new FileOutputStream(dataFile);
+             BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+            byte[] buffer = new byte[1024];
+            while (bis.read(buffer) > 0) {
+                bos.write(buffer);
+            }
             return ResponseEntity.ok().build();
         } catch (IOException e) {
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }
