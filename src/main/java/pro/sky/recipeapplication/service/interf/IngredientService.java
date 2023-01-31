@@ -3,6 +3,7 @@ package pro.sky.recipeapplication.service.interf;
 import pro.sky.recipeapplication.model.Ingredient;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IngredientService {
     Ingredient getIngredient(Long identifier);
@@ -10,9 +11,9 @@ public interface IngredientService {
 
     boolean addNewIngredient(Ingredient ingredient);
 
-    String getAllIngredients();
+    Map<Long, Ingredient> getAllIngredients();
 
-    void editIngredient(long id, Ingredient ingredient);
+    boolean editIngredient(long id, Ingredient ingredient);
 
     boolean deleteIngredient(long id);
 

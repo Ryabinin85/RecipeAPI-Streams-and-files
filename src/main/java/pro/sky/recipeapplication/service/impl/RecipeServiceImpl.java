@@ -84,8 +84,8 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public String getAllRecipes() {
-        return recipeList.toString();
+    public Map<Long, Recipe> getAllRecipes() {
+        return recipeList;
     }
 
     @Override

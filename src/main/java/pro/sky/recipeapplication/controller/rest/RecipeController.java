@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/recipe")
@@ -66,7 +67,7 @@ public class RecipeController {
                     }
             )
     })
-    public ResponseEntity<String> getAllRecipes() {
+    public ResponseEntity<Map<Long, Recipe>> getAllRecipes() {
         return ResponseEntity.ok(recipeService.getAllRecipes());
     }
 

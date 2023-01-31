@@ -5,6 +5,7 @@ import pro.sky.recipeapplication.model.Recipe;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public interface RecipeService {
@@ -16,7 +17,7 @@ public interface RecipeService {
 
     Recipe getRecipe(Long id);
 
-    String getAllRecipes();
+    Map<Long, Recipe> getAllRecipes();
 
     void editRecipe(long id, Recipe recipe);
 

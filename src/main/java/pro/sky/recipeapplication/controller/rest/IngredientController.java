@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import pro.sky.recipeapplication.model.Ingredient;
 import pro.sky.recipeapplication.service.interf.IngredientService;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/ingredients")
 @Tag(name = "Ингредиенты", description = "CRUD операции с ингредиентами")
@@ -50,7 +52,7 @@ public class IngredientController {
                     }
             )
     })
-    public ResponseEntity<String> getAllIngredients() {
+    public ResponseEntity<Map<Long, Ingredient>> getAllIngredients() {
         return ResponseEntity.ok(ingredientService.getAllIngredients());
     }
 
@@ -70,11 +72,10 @@ public class IngredientController {
             @Parameter(name = "ingredient", description = "ингредиент")
     })
     public ResponseEntity<Ingredient> editIngredient(@PathVariable long id, @RequestBody Ingredient ingredient) {
-        ingredientService.editIngredient(id, ingredient);
-        if (ingredient == null) {
-            return ResponseEntity.notFound().build();
+        if (ingredientService.editIngredient(id, ingredient)) {
+            return ResponseEntity.ok(ingredient);
         }
-        return ResponseEntity.ok(ingredient);
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
@@ -82,10 +83,10 @@ public class IngredientController {
             description = "Удаление ингредиента по его id")
     @Parameter(name = "id", description = "id ингредиента")
     public ResponseEntity<Void> deleteIngredient(@PathVariable long id) {
-        if (!ingredientService.deleteIngredient(id)) {
-            return ResponseEntity.notFound().build();
+        if (ingredientService.deleteIngredient(id)) {
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping

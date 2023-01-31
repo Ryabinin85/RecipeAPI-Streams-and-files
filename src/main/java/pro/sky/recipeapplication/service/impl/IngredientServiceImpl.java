@@ -67,24 +67,22 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Override
     public Ingredient getIngredient(Long id) {
-        if (ingredientList.isEmpty() || !ingredientList.containsKey(id)) {
-            return null;
-        } else {
-            return ingredientList.get(id);
-        }
+        return ingredientList.get(id);
     }
 
     @Override
-    public String getAllIngredients() {
-        return ingredientList.toString();
+    public Map<Long, Ingredient> getAllIngredients() {
+        return ingredientList;
     }
 
     @Override
-    public void editIngredient(long id, Ingredient ingredient) {
-        if (ingredient != null && !ingredientList.isEmpty() && ingredientList.containsKey(id)) {
+    public boolean editIngredient(long id, Ingredient ingredient) {
+        if (ingredientList.containsKey(id)) {
             ingredientList.put(id, ingredient);
             saveToFile();
-        }
+            return true;
+        } else
+            return false;
     }
 
     @Override
@@ -93,8 +91,8 @@ public class IngredientServiceImpl implements IngredientService {
             ingredientList.remove(id);
             saveToFile();
             return true;
-        }
-        return false;
+        } else
+            return false;
     }
 
     @Override
