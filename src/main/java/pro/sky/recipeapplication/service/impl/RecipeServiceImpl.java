@@ -138,21 +138,21 @@ public class RecipeServiceImpl implements RecipeService {
                 .orElseThrow();
 
         try (Writer writer = Files.newBufferedWriter(report, StandardOpenOption.APPEND)) {
-            writer.append(recipe.getRecipeName()).append("\n")
+            writer.append(recipe.getRecipeName()).append(System.lineSeparator())
                     .append("Время приготовления: ")
                     .append(String.valueOf(recipe.getCookTime()))
-                    .append(" минут\n")
-                    .append("Ингредиенты: \n");
+                    .append(" минут").append(System.lineSeparator())
+                    .append("Ингредиенты:").append(System.lineSeparator());
 
             for (Ingredient ingredient : recipe.getIngredients()) {
-                writer.append(ingredient.toString()).append("\n");
+                writer.append(ingredient.toString()).append(System.lineSeparator());
             }
 
-            writer.append("Инструкция приготовления: \n");
+            writer.append("Инструкция приготовления:").append(System.lineSeparator());
             for (String str : recipe.getCookingInstruction().values()) {
                 writer.append(String.valueOf(counter))
                         .append(" ")
-                        .append(str).append("\n");
+                        .append(str).append(System.lineSeparator());
                 ++counter;
             }
         }
